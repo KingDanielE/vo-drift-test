@@ -64,6 +64,40 @@
       </div>
     </section>
 
+    <section class="band" id="overview">
+      <div class="wrap">
+        <header class="section-head">
+          <h2>The project in brief</h2>
+        </header>
+        <div class="brief">
+          <div>
+            <h3>The problem</h3>
+            <p>Drones usually know where they are from GPS, which can be jammed or faked. Without it, a drone can work out how it’s moving from its own camera, a technique called visual odometry. But every small error adds to the last, so the estimated position slowly drifts away from the truth.</p>
+          </div>
+          <div>
+            <h3>What I did</h3>
+            <p>I wrote a visual odometry pipeline in Python and OpenCV and ran it on a real 80&nbsp;m indoor drone flight whose true path is known precisely (the EuRoC dataset). I measured how fast the estimate drifts, then degraded the video 12 ways and built a simulated flight over flat ground to see what makes it worse.</p>
+          </div>
+          <div>
+            <h3>What I found</h3>
+            <p>About 0.65&nbsp;m of error for every 10&nbsp;m flown, growing steadily. Image noise hurts accuracy most, blur and dropped frames make tracking fragile, and flat ground makes drift about 15× worse: exactly where a drone needs an absolute fix such as matching its view against a map.</p>
+          </div>
+        </div>
+        <nav class="toc" aria-label="On this page">
+          <h3>On this page</h3>
+          <ol>
+            <li><a href="#results">Results on a real flight</a></li>
+            <li><a href="#how">How the pipeline works</a></li>
+            <li><a href="#stress">Stress tests</a></li>
+            <li><a href="#flat">Flat ground</a></li>
+            <li><a href="#findings">Findings</a></li>
+            <li><a href="#lessons">Bugs and next steps</a></li>
+            <li><a href="#cv">CV</a></li>
+          </ol>
+        </nav>
+      </div>
+    </section>
+
     <section class="band" id="results">
       <div class="wrap">
         <header class="section-head">

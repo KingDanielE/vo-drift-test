@@ -105,6 +105,27 @@ nav .nav-cta:hover { background: var(--accent); color: var(--ink); }
 .section-head { max-width: 70ch; margin-bottom: 32px; }
 .section-head p { color: var(--soft); margin: 14px 0 0; }
 
+.brief { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.brief > div { padding: 24px 28px 8px 0; }
+.brief > div + div { padding-left: 28px; border-left: 1px solid var(--line); }
+.brief p { color: var(--soft); margin: 10px 0 0; }
+@media (max-width: 900px) {
+  .brief { grid-template-columns: 1fr; }
+  .brief > div, .brief > div + div { padding: 22px 0 6px; border-left: 0; }
+  .brief > div + div { border-top: 1px solid var(--line); }
+}
+.toc { display: block; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); }
+.toc h3 { color: var(--muted); font: 500 0.92rem var(--sans); letter-spacing: 0; }
+.toc ol { list-style: none; counter-reset: toc; padding: 0; margin: 14px 0 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.toc li { counter-increment: toc; }
+.toc a {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px;
+  border: 1px solid var(--line); text-decoration: none; font-size: 0.93rem; font-weight: 500;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.toc a::before { content: counter(toc); color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+.toc a:hover { border-color: var(--ink); background: var(--surface); }
+
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .stack { display: grid; gap: 16px; align-content: start; }
 @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
