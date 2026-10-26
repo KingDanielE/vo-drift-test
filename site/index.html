@@ -7,146 +7,169 @@
   <meta name="description" content="How fast does camera-only drone navigation drift? A monocular visual odometry benchmark on EuRoC drone data, with 13 stress experiments and a flat-terrain test.">
   <meta property="og:title" content="Visual Odometry Drift Test · Daniel Engelberg">
   <meta property="og:description" content="Monocular VO on EuRoC drone data: 0.61 m error over an 80 m flight, 6.5% drift per 10 m, 13 stress experiments, and why flat ground is ~15× worse.">
+  <meta property="og:image" content="assets/hero-frame.jpg">
+  <meta name="theme-color" content="#080808">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='%23e8590c' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23e8590c'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23080808'/%3E%3Cpath d='M6 24 L14 16 L20 19 L27 8' fill='none' stroke='%23e5134f' stroke-width='3'/%3E%3Ccircle cx='27' cy='8' r='3' fill='%23fff'/%3E%3C/svg%3E">
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
+
   <header class="topbar">
     <div class="wrap topbar-inner">
       <a class="brand" href="#top">Daniel Engelberg</a>
-      <nav>
+      <nav aria-label="Sections">
         <a href="#results">Results</a>
         <a href="#stress">Stress tests</a>
-        <a href="#findings">Findings</a>
+        <a href="#flat">Flat ground</a>
         <a href="#cv" class="nav-cta">CV</a>
       </nav>
     </div>
   </header>
 
-  <main id="top">
-    <section class="hero wrap">
-      <p class="eyebrow">Project for Vermeer · GPS-free drone navigation</p>
-      <h1>How fast does camera-only navigation drift?</h1>
-      <p class="lead">
-        I built a monocular visual odometry pipeline, ran it on real drone flights with
-        motion-capture ground truth, and stress-tested it under noise, blur, darkness, dropped
-        frames and flat terrain, to measure exactly how a camera's position estimate drifts away
-        from the truth.
-      </p>
-      <div class="stats">
-        <div class="stat"><span class="stat-num">0.61<small> m</small></span><span class="stat-label">position error (ATE) over an 80 m drone flight</span></div>
-        <div class="stat"><span class="stat-num">6.5<small>%</small></span><span class="stat-label">drift per 10 m flown, roughly constant with distance</span></div>
-        <div class="stat"><span class="stat-num">13</span><span class="stat-label">controlled stress experiments on the same flight</span></div>
-        <div class="stat accent"><span class="stat-num">~15<small>×</small></span><span class="stat-label">more drift over flat ground than ground with depth</span></div>
-      </div>
-      <div class="hero-links">
-        <a class="btn primary" href="#cv">View my CV</a>
-        <a class="btn" href="https://github.com/KingDanielE/vo-drift-test" target="_blank" rel="noopener">Code on GitHub</a>
-      </div>
-    </section>
-
-    <section class="wrap" id="results">
-      <div class="section-head">
-        <p class="kicker">01 · Baseline</p>
-        <h2>EuRoC Machine Hall 01: 80 m of real drone flight</h2>
-        <p>Estimated path (orange) against the motion-capture ground truth (grey), seen from above after a best-fit alignment, and the position error along the flight.</p>
-      </div>
-      <div class="grid-2">
-        <figure class="card">
-          <figcaption>Trajectory, top view</figcaption>
-          <svg id="chart-traj" class="chart square" role="img" aria-label="Estimated trajectory against ground truth"></svg>
-          <div class="legend"><span class="sw gt"></span>Ground truth <span class="sw vo"></span>Visual odometry</div>
-        </figure>
-        <figure class="card">
-          <figcaption>Position error along the flight</figcaption>
-          <svg id="chart-err" class="chart" role="img" aria-label="Position error against distance travelled"></svg>
-          <figcaption class="sub">Drift by segment length</figcaption>
-          <svg id="chart-seg" class="chart short" role="img" aria-label="Mean error against segment length"></svg>
-          <p class="note">Error per segment grows in a straight line, about 0.65 m every 10 m: over 1 km without GPS that is tens of metres from VO alone.</p>
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="hero-for">A 6-hour project for Vermeer</p>
+          <h1>How fast does camera&#8209;only navigation drift?</h1>
+          <p class="lead">
+            I built a monocular visual odometry pipeline, ran it on a real drone flight with
+            motion-capture ground truth, then degraded the camera 12 ways and flew it over flat
+            ground, to measure how far a camera’s position estimate wanders from the truth.
+          </p>
+          <div class="actions">
+            <a class="btn primary" href="#cv">View my CV</a>
+            <a class="btn" href="https://github.com/KingDanielE/vo-drift-test" target="_blank" rel="noopener">Code on GitHub</a>
+          </div>
+        </div>
+        <figure class="hero-figure">
+          <div class="frame">
+            <img src="assets/hero-frame.jpg" width="752" height="480" alt="A camera frame from the EuRoC drone flight inside a machine hall, with feature tracks overlaid" fetchpriority="high">
+            <svg id="hero-tracks" viewBox="0 0 752 480" aria-hidden="true"></svg>
+          </div>
+          <figcaption>Real KLT feature tracks over 8 frames of the EuRoC flight. Near pipes move farther than the far wall: that parallax is what visual odometry turns into motion.</figcaption>
         </figure>
       </div>
-    </section>
-
-    <section class="wrap" id="how">
-      <div class="section-head">
-        <p class="kicker">02 · Method</p>
-        <h2>What I built</h2>
-      </div>
-      <ol class="steps">
-        <li><span class="step-n">1</span><h3>Track</h3><p>Shi-Tomasi corners tracked frame to frame with pyramidal KLT optical flow; new keyframe after 10 px of image motion.</p></li>
-        <li><span class="step-n">2</span><h3>Estimate motion</h3><p>Essential matrix with RANSAC, then rotation and direction of travel. Steps with few inliers or implausible rotation are rejected.</p></li>
-        <li><span class="step-n">3</span><h3>Chain poses</h3><p>Relative motions chained into a trajectory, converted from the camera frame to the drone body frame (IMU) for comparison.</p></li>
-        <li><span class="step-n">4</span><h3>Evaluate</h3><p>ATE after SE3 alignment and relative error (RPE) over 2, 5, 10 and 20 m segments with <code>evo</code>; one script reruns everything.</p></li>
-      </ol>
-      <p class="caveat"><strong>Scope, stated plainly:</strong> a single camera cannot measure absolute scale, so step length comes from ground truth (“oracle scale”). The drift measured here is rotation and direction drift, the part a camera is responsible for.</p>
-    </section>
-
-    <section class="wrap" id="stress">
-      <div class="section-head">
-        <p class="kicker">03 · Stress tests</p>
-        <h2>Same flight, degraded 12 ways</h2>
-        <p>Drift per 2 m and per 10 m (lines) and lost or rejected motion estimates (bars) as each condition gets worse.</p>
-      </div>
-      <div class="grid-2" id="stress-charts"></div>
-      <div class="legend center"><span class="sw short"></span>Drift per 2 m <span class="sw vo"></span>Drift per 10 m <span class="sw bar"></span>Lost + rejected steps</div>
-      <div class="table-wrap">
-        <table id="stress-table">
-          <thead><tr><th>Condition</th><th>ATE (m)</th><th>Drift / 2 m</th><th>Drift / 10 m</th><th>Lost + rejected</th></tr></thead>
-          <tbody></tbody>
-        </table>
+      <div class="wrap">
+        <dl class="stats">
+          <div><dt>Position error over an 80&nbsp;m flight</dt><dd>0.61<span>&nbsp;m</span></dd></div>
+          <div><dt>Drift per 10&nbsp;m flown, steady with distance</dt><dd>6.5<span>%</span></dd></div>
+          <div><dt>Controlled stress experiments</dt><dd>13</dd></div>
+          <div class="hot"><dt>More drift over flat ground</dt><dd>~15<span>×</span></dd></div>
+        </dl>
       </div>
     </section>
 
-    <section class="wrap" id="flat">
-      <div class="section-head">
-        <p class="kicker">04 · The drone-specific risk</p>
-        <h2>Flat ground breaks a downward camera</h2>
-        <p>A synthetic downward-looking flight (24 m arc at 5 m height, exact ground truth) over the same texture, once with raised 1 m blocks and once perfectly flat.</p>
+    <section class="band" id="results">
+      <div class="wrap">
+        <header class="section-head">
+          <h2>80 metres of real drone flight</h2>
+          <p>EuRoC Machine Hall 01. The estimated path (red) against motion-capture ground truth (grey, dashed), seen from above after a best-fit alignment.</p>
+        </header>
+        <div class="grid-2">
+          <figure class="panel">
+            <figcaption>Trajectory, top view</figcaption>
+            <svg id="chart-traj" class="chart" role="img" aria-label="Estimated trajectory against ground truth, top view"></svg>
+            <p class="legend"><span class="sw gt"></span>Ground truth <span class="sw vo"></span>Visual odometry</p>
+          </figure>
+          <div class="stack">
+            <figure class="panel">
+              <figcaption>Position error along the flight</figcaption>
+              <svg id="chart-err" class="chart" role="img" aria-label="Position error against distance travelled"></svg>
+            </figure>
+            <figure class="panel">
+              <figcaption>Error by segment length</figcaption>
+              <svg id="chart-seg" class="chart" role="img" aria-label="Mean error against segment length"></svg>
+              <p class="note">A straight line: about 0.65&nbsp;m more error for every 10&nbsp;m flown. Over 1&nbsp;km without GPS that is tens of metres from vision alone.</p>
+            </figure>
+          </div>
+        </div>
       </div>
-      <div class="grid-2">
-        <figure class="card">
-          <figcaption>Ground with depth <span class="pill good" id="blocks-pill"></span></figcaption>
-          <svg id="chart-blocks" class="chart square" role="img" aria-label="Trajectory over ground with raised blocks"></svg>
-        </figure>
-        <figure class="card">
-          <figcaption>Flat ground <span class="pill bad" id="flat-pill"></span></figcaption>
-          <svg id="chart-flatc" class="chart square" role="img" aria-label="Trajectory over flat ground"></svg>
-        </figure>
-      </div>
-      <p class="explain">Over a perfectly flat scene the essential matrix has two valid solutions, and the pipeline picks the wrong one often enough to multiply drift. Fields, desert, water and car parks look like this to a drone. A production system needs plane-aware (homography) estimation or an IMU to break the ambiguity.</p>
     </section>
 
-    <section class="wrap" id="findings">
-      <div class="section-head">
-        <p class="kicker">05 · Findings</p>
-        <h2>What the data says</h2>
+    <section class="band" id="how">
+      <div class="wrap">
+        <header class="section-head">
+          <h2>How the pipeline works</h2>
+        </header>
+        <ol class="steps">
+          <li><h3>Track</h3><p>Shi-Tomasi corners followed frame to frame with pyramidal KLT optical flow; a new keyframe after 10&nbsp;px of image motion.</p></li>
+          <li><h3>Estimate motion</h3><p>Essential matrix with RANSAC gives rotation and direction of travel. Steps with few inliers or implausible rotation are rejected.</p></li>
+          <li><h3>Chain poses</h3><p>Relative motions chained into a path and converted from the camera frame to the drone’s body (IMU) frame.</p></li>
+          <li><h3>Evaluate</h3><p>Absolute error after SE3 alignment, and relative error over 2, 5, 10 and 20&nbsp;m segments with <code>evo</code>. One script reruns everything.</p></li>
+        </ol>
+        <p class="caveat"><strong>Scope:</strong> one camera can’t measure absolute scale, so each step’s length comes from ground truth. What’s measured is rotation and direction drift: the part the camera is responsible for.</p>
       </div>
-      <div class="findings">
-        <article><h3>Drift grows linearly with distance</h3><p>6.5–8% at every segment length from 2 to 20 m. VO alone can't hold position over long flights; it needs a correction source such as an IMU, map matching or satellite imagery.</p></article>
-        <article><h3>Flat terrain is the worst case</h3><p>About 3% drift per 10 m with depth in the scene, about 55% over flat ground. Repeatable across runs.</p></article>
-        <article><h3>Image noise hurts the most</h3><p>Short-range drift rose from 8% to 12% per 2 m and ATE more than doubled at σ = 30 (0.61 → 1.44 m): noise shifts the corners that KLT tracks.</p></article>
-        <article><h3>Blur and dropped frames cost robustness first</h3><p>Drift per 10 m barely moved, but lost or rejected steps rose from 2 to 27 (heavy blur) and 36 (every 4th frame): the system gets close to losing track before accuracy changes.</p></article>
-        <article><h3>Darkness alone did little</h3><p>Tracking ignores uniform brightness changes. Real low light adds sensor noise and motion blur, and the noise is what does the damage.</p></article>
-      </div>
-      <p class="fineprint">One run per condition: differences under about 2 percentage points are within run-to-run variation, so read the trends, not single cells.</p>
     </section>
 
-    <section class="wrap" id="lessons">
-      <div class="grid-2 text">
+    <section class="band" id="stress">
+      <div class="wrap">
+        <header class="section-head">
+          <h2>The same flight, degraded 12&nbsp;ways</h2>
+          <p>Drift per 2&nbsp;m and per 10&nbsp;m (lines) and lost or rejected motion estimates (bars) as each condition gets worse.</p>
+        </header>
+        <div class="grid-2" id="stress-charts"></div>
+        <p class="legend center"><span class="sw short"></span>Drift per 2&nbsp;m <span class="sw vo"></span>Drift per 10&nbsp;m <span class="sw bar"></span>Lost + rejected steps</p>
+        <div class="table-wrap">
+          <table id="stress-table">
+            <thead><tr><th scope="col">Condition</th><th scope="col">Error (ATE)</th><th scope="col">Drift / 2&nbsp;m</th><th scope="col">Drift / 10&nbsp;m</th><th scope="col">Lost + rejected</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="flat">
+      <div class="wrap">
+        <header class="section-head">
+          <h2>Flat ground breaks a downward camera</h2>
+          <p>A synthetic downward-looking flight (24&nbsp;m arc at 5&nbsp;m height, exact ground truth) over the same texture: once with raised 1&nbsp;m blocks, once perfectly flat.</p>
+        </header>
+        <div class="grid-2">
+          <figure class="panel">
+            <figcaption>Ground with depth <span class="tag" id="blocks-tag"></span></figcaption>
+            <svg id="chart-blocks" class="chart" role="img" aria-label="Trajectory over ground with raised blocks"></svg>
+          </figure>
+          <figure class="panel">
+            <figcaption>Flat ground <span class="tag hot" id="flat-tag"></span></figcaption>
+            <svg id="chart-flatc" class="chart" role="img" aria-label="Trajectory over flat ground"></svg>
+          </figure>
+        </div>
+        <p class="explain">Over a perfectly flat scene the essential matrix has two valid solutions, and the pipeline picks the wrong one often enough to multiply drift. Fields, desert, water and car parks all look like this from above. A production system needs plane-aware (homography) estimation or an IMU to break the tie.</p>
+      </div>
+    </section>
+
+    <section class="band" id="findings">
+      <div class="wrap">
+        <header class="section-head">
+          <h2>What the data says</h2>
+        </header>
+        <dl class="findings">
+          <div><dt>Drift grows linearly with distance</dt><dd>6.5–8% at every segment length from 2 to 20&nbsp;m. Vision alone can’t hold position over a long flight; it needs a correction source such as an IMU, map matching or satellite imagery.</dd></div>
+          <div><dt>Flat terrain is the worst case</dt><dd>About 3% drift per 10&nbsp;m with depth in the scene, about 55% over flat ground. Repeatable across runs.</dd></div>
+          <div><dt>Image noise hurts the most</dt><dd>Short-range drift rose from 8% to 12% per 2&nbsp;m and the absolute error more than doubled at σ&nbsp;=&nbsp;30 (0.61 → 1.44&nbsp;m): noise moves the corners KLT tracks.</dd></div>
+          <div><dt>Blur and dropped frames cost robustness first</dt><dd>Drift per 10&nbsp;m barely moved, but lost or rejected steps rose from 2 to 27 (heavy blur) and 36 (every 4th frame): the system gets close to losing track before accuracy changes.</dd></div>
+          <div><dt>Darkness alone did little</dt><dd>Tracking ignores uniform brightness changes. Real low light adds sensor noise and motion blur, and the noise is what does the damage.</dd></div>
+        </dl>
+        <p class="fineprint">One run per condition: differences under about 2 percentage points are within run-to-run variation, so read the trends rather than single cells.</p>
+      </div>
+    </section>
+
+    <section class="band" id="lessons">
+      <div class="wrap grid-2 text">
         <div>
-          <p class="kicker">06 · Debugging</p>
           <h2>Two bugs worth knowing about</h2>
           <ul class="ticks">
-            <li><strong>Camera vs body frame.</strong> EuRoC ground truth is the IMU body's pose. Comparing camera poses to it directly made relative errors look 7× worse; converting with the camera-to-body transform fixed it.</li>
-            <li><strong>OpenCV's depth cutoff.</strong> <code>recoverPose</code> drops points farther than 50 step lengths by default. In a large hall with small steps that threw away most points and rejected two thirds of valid motion estimates.</li>
+            <li><strong>Camera vs body frame.</strong> EuRoC ground truth is the IMU body’s pose. Comparing camera poses to it directly made relative errors look 7× worse; converting with the camera-to-body transform fixed it.</li>
+            <li><strong>OpenCV’s depth cutoff.</strong> <code>recoverPose</code> drops points farther than 50 step lengths by default. In a large hall with small steps that discarded most points and rejected two thirds of valid motion estimates.</li>
           </ul>
         </div>
         <div>
-          <p class="kicker">07 · Next</p>
-          <h2>Where I'd take it</h2>
+          <h2>Where I’d take it next</h2>
           <ul class="ticks">
             <li>Fuse the IMU gyro for rotation, removing most heading drift.</li>
             <li>Plane-aware (homography) motion estimation for downward cameras over flat terrain.</li>
@@ -157,29 +180,28 @@
       </div>
     </section>
 
-    <section class="cv-section" id="cv">
+    <section class="cv-band" id="cv">
       <div class="wrap">
         <div class="cv-head">
           <div>
-            <p class="kicker">CV</p>
             <h2>Daniel Engelberg</h2>
             <p>Robotics engineer, B.Sc. Mechanical Engineering (Technion). Authorized to work in the US, relocating to New York.</p>
           </div>
-          <div class="cv-actions">
-            <a class="btn primary" href="assets/Daniel-Engelberg-CV.pdf" download>Download PDF</a>
-            <a class="btn" href="assets/Daniel-Engelberg-CV.pdf" target="_blank" rel="noopener">Open in new tab</a>
+          <div class="actions">
+            <a class="btn primary" href="assets/Daniel-Engelberg-CV.pdf" download>Download CV (PDF)</a>
+            <a class="btn" href="assets/Daniel-Engelberg-CV.pdf" target="_blank" rel="noopener">Open in New Tab</a>
           </div>
         </div>
-        <object class="cv-frame" data="assets/Daniel-Engelberg-CV.pdf#navpanes=0&amp;view=FitH" type="application/pdf" aria-label="CV PDF">
-          <p class="cv-fallback">Your browser can't show the PDF here. <a href="assets/Daniel-Engelberg-CV.pdf">Open the CV</a>.</p>
+        <object class="cv-frame" data="assets/Daniel-Engelberg-CV.pdf#navpanes=0&amp;view=FitH" type="application/pdf" aria-label="CV">
+          <p class="cv-fallback">Your browser can’t show the PDF here. <a href="assets/Daniel-Engelberg-CV.pdf">Open the CV</a>.</p>
         </object>
       </div>
     </section>
   </main>
 
   <footer class="wrap footer">
-    <span>Daniel Engelberg · <a href="mailto:danielengelberg131@gmail.com">danielengelberg131@gmail.com</a> · <a href="https://www.linkedin.com/in/danielengelberg/" target="_blank" rel="noopener">LinkedIn</a></span>
-    <span>Data: EuRoC MAV dataset (ETH Zürich)</span>
+    <span><a href="mailto:danielengelberg131@gmail.com">danielengelberg131@gmail.com</a> · <a href="https://www.linkedin.com/in/danielengelberg/" target="_blank" rel="noopener">LinkedIn</a></span>
+    <span>Data: EuRoC MAV dataset, ETH Zürich. Independent project, not affiliated with Vermeer.</span>
   </footer>
 
   <script src="data.js"></script>

@@ -21,6 +21,7 @@
     for (let v = Math.ceil(min / step) * step; v <= max + 1e-9; v += step) ticks.push(+v.toFixed(6));
     return ticks;
   }
+  const fixed = (v, d) => (Math.round(v * 10 ** d + 1e-9) / 10 ** d).toFixed(d); // 0.605 -> "0.61"
   const fmt = (v) => (Math.abs(v) >= 10 || Number.isInteger(v) ? String(Math.round(v)) : v.toFixed(1));
 
   // Top-view trajectory with equal axis scaling.
@@ -69,7 +70,7 @@
     xt.forEach((v, i) => el(svg, "text", { x: X(v), y: H - B + 16, "text-anchor": "middle" }, o.xFmt ? o.xFmt(v, i) : fmt(v)));
     el(svg, "line", { x1: L, x2: W - R, y1: H - B, y2: H - B, class: "axis" });
     if (o.bars) {
-      const bmax = Math.max(...o.bars.map((b) => b[1]), 1) * 1.15;
+      const bmax = Math.max(...o.bars.map((b) => b[1]), 1) * 1.8; // keep bars in the lower half
       const bw = Math.min(22, (W - L - R) / o.bars.length / 2.5);
       for (const [x, v] of o.bars) {
         const h = (v / bmax) * (H - T - B);
@@ -85,7 +86,16 @@
     if (o.xLabel) el(svg, "text", { x: W - R, y: H - 4, "text-anchor": "end" }, o.xLabel);
   }
 
-  // 01 baseline
+  // Hero: real feature tracks over the camera frame, drawn in once on load.
+  const hero = document.getElementById("hero-tracks");
+  (window.VO_TRACKS || []).forEach((t, i) => {
+    const d = `${((i * 37) % 60) / 100}s`;
+    el(hero, "path", { d: path(t), class: "trk", pathLength: 1, style: `--d:${d}` });
+    const end = t[t.length - 1];
+    el(hero, "circle", { cx: end[0], cy: end[1], r: 3.2, class: "trk-dot", style: `--d:${d}` });
+  });
+
+  // Baseline
   trajectory(document.getElementById("chart-traj"), D.euroc);
   lineChart(document.getElementById("chart-err"), [{ pts: D.euroc.err, cls: "vo" }], {
     xLabel: "distance travelled [m]", yLabel: "error [m]", xmin: 0, H: 190,
@@ -96,7 +106,7 @@
     xLabel: "segment length [m]", yLabel: "mean error [m]", xmin: 0, xTicks: [0].concat(D.segments), H: 170,
   });
 
-  // 03 stress tests
+  // Stress tests
   const FACTORS = [
     { key: "noise_sigma", title: "Image noise", unit: "Gaussian σ", labels: ["0", "10", "20", "30"] },
     { key: "blur_px", title: "Blur", unit: "kernel px", labels: ["0", "5", "9", "15"] },
@@ -108,8 +118,8 @@
   for (const f of FACTORS) {
     const rows = [base].concat(D.stress.filter((r) => r.factor === f.key));
     const card = document.createElement("figure");
-    card.className = "card stress-card";
-    card.innerHTML = `<h3>${f.title} <span class="unit">· ${f.unit}</span></h3>`;
+    card.className = "panel stress-card";
+    card.innerHTML = `<h3>${f.title} <span class="unit">(${f.unit})</span></h3>`;
     const svg = document.createElementNS(NS, "svg");
     svg.setAttribute("class", "chart");
     svg.setAttribute("role", "img");
@@ -128,32 +138,32 @@
 
   // stress table
   const NAMES = {
-    baseline: "Clean", brightness: "Brightness", blur_px: "Blur", noise_sigma: "Noise σ", frame_skip: "Every Nth frame",
+    baseline: "Clean", brightness: "Brightness", blur_px: "Blur", noise_sigma: "Noise σ", frame_skip: "Every",
   };
   const levelText = (r) => {
     if (r.factor === "brightness") return `${Math.round(r.level * 100)}%`;
     if (r.factor === "blur_px") return `${r.level} px`;
-    if (r.factor === "frame_skip") return `${r.level}`;
+    if (r.factor === "frame_skip") return { 2: "2nd", 3: "3rd", 4: "4th" }[r.level] + " frame";
     return String(r.level);
   };
   const tbody = document.querySelector("#stress-table tbody");
   for (const r of D.stress) {
     const tr = document.createElement("tr");
     if (r.run === "baseline") tr.className = "base";
-    const hot = (v, b) => (v >= b * 1.4 ? ' class="hot"' : "");
+    const hot = (v, b) => (v >= b * 2 ? ' class="hot"' : "");
     const lost = r.failures + r.rejected;
     tr.innerHTML =
       `<td>${r.run === "baseline" ? NAMES.baseline : NAMES[r.factor] + " " + levelText(r)}</td>` +
-      `<td${hot(r.ate_rmse_m, base.ate_rmse_m)}>${r.ate_rmse_m.toFixed(2)}</td>` +
-      `<td${hot(r.drift_2m_pct, base.drift_2m_pct)}>${r.drift_2m_pct.toFixed(1)}%</td>` +
-      `<td${hot(r.drift_10m_pct, base.drift_10m_pct)}>${r.drift_10m_pct.toFixed(1)}%</td>` +
+      `<td${hot(r.ate_rmse_m, base.ate_rmse_m)}>${fixed(r.ate_rmse_m, 2)} m</td>` +
+      `<td${hot(r.drift_2m_pct, base.drift_2m_pct)}>${fixed(r.drift_2m_pct, 1)}%</td>` +
+      `<td${hot(r.drift_10m_pct, base.drift_10m_pct)}>${fixed(r.drift_10m_pct, 1)}%</td>` +
       `<td${lost >= 15 ? ' class="hot"' : ""}>${lost}</td>`;
     tbody.appendChild(tr);
   }
 
-  // 04 flat vs blocks
+  // Flat vs blocks
   trajectory(document.getElementById("chart-blocks"), D.blocks);
   trajectory(document.getElementById("chart-flatc"), D.flat);
-  document.getElementById("blocks-pill").textContent = `${D.blocks.metrics.drift_10m_pct.toFixed(1)}% drift / 10 m`;
-  document.getElementById("flat-pill").textContent = `${D.flat.metrics.drift_10m_pct.toFixed(1)}% drift / 10 m`;
+  document.getElementById("blocks-tag").textContent = `${fixed(D.blocks.metrics.drift_10m_pct, 1)}% drift per 10 m`;
+  document.getElementById("flat-tag").textContent = `${fixed(D.flat.metrics.drift_10m_pct, 1)}% drift per 10 m`;
 })();
