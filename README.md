@@ -59,7 +59,7 @@ Context: navigation for drones where GPS is unavailable.
    and more than doubled ATE at σ=30 (0.61 → 1.44 m). Noise moves the corners that KLT tracks,
    so every step gets a little less accurate.
 4. **Blur and frame drops cost robustness before accuracy.** Drift per 10 m barely changed,
-   but lost and rejected steps rose from 2 to 24 (heavy blur) and 32 (every 4th frame): the
+   but lost and rejected steps rose from 2 to 27 (heavy blur) and 36 (every 4th frame): the
    system is closer to losing track. Fewer frames even lowered drift slightly (6.5% → 4.7%),
    because fewer, longer steps chain fewer small errors, until tracking starts to break.
 5. **Darkening alone did little.** KLT and corner detection are nearly unaffected by scaling

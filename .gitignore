@@ -2,3 +2,4 @@ data/
 results/*.txt
 __pycache__/
 *.pyc
+.vercel/
